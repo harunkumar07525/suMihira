@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PDF → XML Editor</title>
+    <link rel="stylesheet" href="/static/xonomy.css">
+     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+   
+    <script src="/static/xonomy.js"></script>
+    <style>
+        #editor { border: 1px solid #ccc; height: 400px; overflow: auto; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h2>Upload PDF</h2>
+    <form method="POST" action="/upload" enctype="multipart/form-data">
+        <input type="file" name="pdffile" accept=".pdf">
+        <button type="submit">Upload</button>
+    </form>
+
+    {% if xml_content %}
+    <h2>Edit Extracted XML</h2>
+    <div id="editor"></div>
+    <form method="POST" action="/download" onsubmit="return prepareDownload()">
+        <textarea name="xml" id="xml" style="display:none;"></textarea>
+        <button type="submit">Download Updated PDF</button>
+    </form>
+
+    <script>
+        function startEditor(xml) {
+            var editor = document.getElementById("editor");
+            var docSpec = {};
+            Xonomy.render(xml, editor, docSpec);
+        }
+        function prepareDownload() {
+            var xml = Xonomy.harvest();
+            document.getElementById("xml").value = xml;
+            return true;
+        }
+        startEditor(`{{ xml_content|safe }}`);
+    </script>
+    {% endif %}
+</body>
+</html>
